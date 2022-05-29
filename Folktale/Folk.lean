@@ -4,6 +4,8 @@ Released under the MIT license described in the file LICENSE.
 Authors: Mac Malone
 -/
 
+import Folktale.Classical
+
 /-!
 Folktale's formalization of the concept of knights and knaves.
 -/
@@ -57,8 +59,44 @@ axiom knave_lie {K : Folk} {P : Prop} :
 -- # Helpers
 
 /--
-The proposition that two folks are of the same type
+The proposition that 2 folks are of the same type
 (i.e., either both knights or both knaves).
 -/
-def same2 (k1 k2 : Folk) :=
+abbrev same2 (k1 k2 : Folk) :=
   (knight k1 ∧ knight k2) ∨ (knave k1 ∧ knave k2)
+
+/--
+The proposition that 3 folks are of the same type
+(i.e., either all knights or all knaves).
+-/
+abbrev same3 (k1 k2 k3 : Folk)  :=
+  (knight k1 ∧ knight k2 ∧ knight k3) ∨ (knave k1 ∧ knave k2 ∧ knave k3)
+
+/-- If 3 folks are not the same, one is a knight and one is a knave. -/
+theorem not_same3_one_knight_knave : ¬ same3 A B C →
+(knight A ∨ knight B ∨ knight C) ∧ (knave A ∨ knave B ∨ knave C) := by
+  intro h
+  let hor := Classical.dm_or h
+  refine And.intro ?one_knight ?one_knave
+  case one_knight =>
+    let not_all_knaves := hor.2
+    cases Classical.dm_and not_all_knaves with
+    | inl not_A =>
+      exact Or.inl <| not_knave_knight not_A
+    | inr not_B_C =>
+      cases Classical.dm_and not_B_C with
+      | inl not_B =>
+        exact Or.inr <| Or.inl <| not_knave_knight not_B
+      | inr not_C =>
+        exact Or.inr <| Or.inr <| not_knave_knight not_C
+  case one_knave =>
+    let not_all_knights := hor.1
+    cases Classical.dm_and not_all_knights with
+    | inl not_A =>
+      exact Or.inl <| not_knight_knave not_A
+    | inr not_B_C =>
+      cases Classical.dm_and not_B_C with
+      | inl not_B =>
+        exact Or.inr <| Or.inl <| not_knight_knave not_B
+      | inr not_C =>
+        exact Or.inr <| Or.inr <| not_knight_knave not_C
