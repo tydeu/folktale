@@ -69,7 +69,7 @@ axiom G_same_E_F :
   G.say <| same2 E F
 
 axiom H_G_X_Y :
-  H.say <| (same2 H G ∧ ¬ (guilty X ∧ guilty Y))
+  H.say <| same2 H G ∧ ¬ (guilty X ∧ guilty Y)
 
 -- # Deductions
 
